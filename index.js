@@ -1,3 +1,5 @@
+var ConstDependency = require("webpack/lib/dependencies/ConstDependency");
+
 function SkipAMDOfUMDPlugin(requestRegExp) {
   this.requestRegExp = requestRegExp;
 }

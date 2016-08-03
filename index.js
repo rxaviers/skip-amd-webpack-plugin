@@ -16,9 +16,6 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
   // plugins instead of just appending them.
   var self = this;
 
-  compiler.parser.plugin("can-rename define", function() {
-    return false;
-  });
   compiler.parser.plugin("evaluate typeof define", function(expr) {
     if (self.requestRegExp.test(this.state.current.request)) {
       var res = compiler.parser.evaluate("typeof (false)");

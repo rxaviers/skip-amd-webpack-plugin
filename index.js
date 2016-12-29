@@ -1,5 +1,3 @@
-var ConstDependency = require("webpack/lib/dependencies/ConstDependency");
-
 function SkipAMDPlugin(requestRegExp) {
   this.requestRegExp = requestRegExp;
 }
@@ -16,22 +14,17 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
   // plugins instead of just appending them.
   var self = this;
 
-  compiler.parser.plugin("evaluate typeof define", function(expr) {
-    if (self.requestRegExp.test(this.state.current.request)) {
-      var res = compiler.parser.evaluate("typeof (false)");
-      res.setRange(expr.range);
-      return res;
-    }
+  compiler.plugin('normal-module-factory', function(nmf) {
+    nmf.plugin('before-resolve', function(result, callback) {
+      if (!result) {
+        return callback();
+      }
+      if (self.requestRegExp.test(result.request)) {
+        result.request = 'imports-loader?define=>false!' + result.request;
+      }
+      return callback(null, result);
+    });
   });
-  compiler.parser.plugin("typeof define", function(expr) {
-    if (self.requestRegExp.test(this.state.current.request)) {
-      var dep = new ConstDependency("typeof (false)", expr.range);
-      dep.loc = expr.loc;
-      this.state.current.addDependency(dep);
-      return true;
-    }
-  });
-
 };
 
 module.exports = SkipAMDPlugin;

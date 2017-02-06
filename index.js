@@ -33,7 +33,7 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
         return true;
       }
     });
-  }
+  };
 
   // Hack to support webpack 1.x and 2.x.
   // webpack 2.x

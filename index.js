@@ -20,7 +20,7 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
   var run = function(parser) {
     parser.plugin("evaluate typeof define", function(expr) {
       if (self.requestRegExp.test(this.state.current.request)) {
-        var res = compiler.parser.evaluate("typeof (false)");
+        var res = parser.evaluate("typeof (false)");
         res.setRange(expr.range);
         return res;
       }

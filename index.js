@@ -1,5 +1,6 @@
 var ConstDependency = require("webpack/lib/dependencies/ConstDependency");
 var NormalModuleFactory = require("webpack/lib/NormalModuleFactory");
+var ReplaceSource = require("webpack-sources").ReplaceSource;
 
 function SkipAMDPlugin(requestRegExp) {
   this.requestRegExp = requestRegExp;
@@ -38,9 +39,20 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
   // Hack to support webpack 1.x and 2.x.
   // webpack 2.x
   if (NormalModuleFactory.prototype.createParser) {
-    compiler.plugin("compilation", function(compilation, params) {
-      params.normalModuleFactory.plugin("parser", run);
-    });
+      compiler.plugin("compilation", function(compilation, params) {
+        if (this.requestRegExp) {
+          params.normalModuleFactory.plugin("parser", run);
+        } else {
+          compilation.templatesPlugin("render-with-entry", function(source) {
+            const defineAMD = source.source().search(/define\.amd/);
+            const newSource = new ReplaceSource(source);
+            
+            newSource.replace(defineAMD, defineAMD + 9, 'false');
+
+            return newSource;
+          });
+        }
+      });
 
   // webpack 1.x
   } else {

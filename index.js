@@ -47,7 +47,9 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
             const defineAMD = source.source().search(/define\.amd/);
             const newSource = new ReplaceSource(source);
             
-            return newSource.replace(defineAMD, defineAMD + 9, 'false');
+            newSource.replace(defineAMD, defineAMD + 9, 'false');
+
+            return newSource;
           });
         }
       });

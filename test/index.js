@@ -6,10 +6,10 @@ const fs = require("fs");
 const mkdirp = require("mkdirp");
 const path = require("path");
 const rimraf = require("rimraf");
+const util = require("util");
 const webpack = require("webpack");
 
-const outputPath = path.join(__dirname, "../tmp/test-output");
-
+const promisefiedRimraf = util.promisify(rimraf);
 const promisefiedWebpack = config =>
   new Promise((resolve, reject) => {
     webpack(config, (error, stats) => {
@@ -20,22 +20,22 @@ const promisefiedWebpack = config =>
     });
   });
 
+const outputPath = path.join(__dirname, "../tmp/test-output");
+
 describe("SkipAMDPlugin Plugin", () => {
-  before(done => {
-    rimraf(outputPath, () => {
-      mkdirp.sync(outputPath);
-      promisefiedWebpack({
-        entry: {
-          app: path.join(__dirname, "fixtures/app")
-        },
-        output: {
-          path: outputPath,
-          filename: "app.js"
-        },
-        plugins: [new SkipAMDPlugin(/[/\\]fixtures[/\\]app/)]
-      })
-        .then(() => done())
-        .catch(done);
+  before(async () => {
+    await promisefiedRimraf(outputPath);
+    mkdirp.sync(outputPath);
+    await promisefiedWebpack({
+      entry: {
+        app: path.join(__dirname, "fixtures/app")
+      },
+      mode: "development",
+      output: {
+        path: outputPath,
+        filename: "app.js"
+      },
+      plugins: [new SkipAMDPlugin(/[/\\]fixtures[/\\]app/)]
     });
   });
 
@@ -45,13 +45,8 @@ describe("SkipAMDPlugin Plugin", () => {
     expect(outputFileExists).to.be.true;
     const content = fs.readFileSync(outputFilepath).toString();
     expect(content).to.be.a("string");
-    expect(content).to.include(`// UMD returnExports
-  if (false) {
-    // AMD
-    define(["dep"], factory);
-  } else if (true) {
-    // Node, CommonJS
-    module.exports = factory(__webpack_require__(1));
-  } else {`);
+    expect(content).to.include(
+      "// UMD returnExports\\n  if (false) {} else if (true) {\\n    // Node, CommonJS\\n    module.exports = factory(__webpack_require__("
+    );
   });
 });

@@ -42,11 +42,10 @@ SkipAMDPlugin.prototype.apply = function(compiler) {
       params.normalModuleFactory.plugin("parser", run);
     });
 
-  // webpack 1.x
+    // webpack 1.x
   } else {
     run(compiler.parser);
   }
-
 };
 
 module.exports = SkipAMDPlugin;

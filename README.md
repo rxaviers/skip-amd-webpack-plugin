@@ -9,7 +9,7 @@ Starting from *v1.0.0*, only *webpack 4* is supported. If you need support for *
 
 | skip-amd-webpack-plugin | webpack                        |
 | ----------------------- | ------------------------------ |
-| 1.x                     | ^4.0.0                         |
+| 1.x                     | ^4.0.0 \|\| ^5.0.0             |
 | 0.x                     | ^1.9.0 \|\| ^2.2.0 \|\| ^3.0.0 |
 
     npm install skip-amd-webpack-plugin --save-dev
@@ -36,3 +36,4 @@ MyPlugin.prototype.apply = function(compiler) {
 
     npm install
     npm test
+
